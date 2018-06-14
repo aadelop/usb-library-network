@@ -19,11 +19,140 @@ rule NetworkAdminUser {
     resource: "**"
     action: ALLOW
 }
-
 rule NetworkAdminSystem {
     description: "Grant business network administrators full access to system resources"
     participant: "org.hyperledger.composer.system.NetworkAdmin"
     operation: ALL
     resource: "org.hyperledger.composer.system.**"
     action: ALLOW
+}
+
+/**
+    * Reglas de acceso a registros de Participantes.
+**/
+rule Transcriptor_R_Transcriptor{
+    description: "Otorga acceso a Transcriptor a los recursos de Transcriptor "
+    participant: "org.usb.library.programs.Transcriptor"
+    operation: READ
+    resource: "org.usb.library.programs.Transcriptor"
+    action: ALLOW
+}
+
+rule Supervisor_R_Supervisor{
+    description: "Otorga acceso a Supervisor a los recursos de Supervisor "
+    participant: "org.usb.library.programs.Supervisor"
+    operation: READ
+    resource: "org.usb.library.programs.Supervisor"
+    action: ALLOW
+}
+rule Auditor_R_Auditor{
+    description: "Otorga acceso a Auditor a los recursos de Auditor "
+    participant: "org.usb.library.programs.Auditor"
+    operation: READ
+    resource: "org.usb.library.programs.Auditor"
+    action: ALLOW
+}
+
+rule Proponente_R_Proponente{
+    description: "Otorga acceso a Proponente a los recursos de Proponente "
+    participant: "org.usb.library.programs.Proponente"
+    operation: READ
+    resource: "org.usb.library.programs.Proponente"
+    action: ALLOW
+}
+/**
+ *Regas de ejecucion de Transacciones.
+ */
+
+rule Proponente_C_SupervisorAsignado{
+    description: "Permiso de transaccion para asignar un Supervisor a una Transcripcion"
+    participant: "org.usb.library.programs.Proponente"
+    operation: CREATE
+    resource: "org.usb.library.programs.SupervisorAsignado"
+    action: ALLOW
+}
+rule Supervisor_C_TranscriptorAsignado{
+    description: "Permiso de transaccion para asignar un Transcriptor "
+    participant: "org.usb.library.programs.Supervisor"
+    operation: CREATE
+    resource: "org.usb.library.programs.TranscriptorAsignado"
+    action: ALLOW
+}
+rule Supervisor_C_RevisionTranscrip{
+    description: "Permiso de transaccion para realizar una revision enuna Transcripcion"
+    participant: "org.usb.library.programs.Supervisor"
+    operation: CREATE
+    resource: "org.usb.library.programs.RevisionTranscrip"
+    action: ALLOW    
+}
+rule Supervisor_C_TranscripPorValidar{
+    description: "Se solicita revision final y se actualiza estado de Transcripcion"
+    participant: "org.usb.library.programs.Supervisor"
+    operation: CREATE
+    resource: "org.usb.library.programs.TranscripPorValidar"
+    action: ALLOW 
+}
+rule Auditor_C_ObservacionTranscrip{
+    description: "Se envian cambios u observaciones necesarias para Aprobar transcripcion"
+    participant: "org.usb.library.programs.Auditor"
+    operation: CREATE
+    resource: "org.usb.library.programs.ObservacionTranscrip"
+    action: ALLOW 
+}
+rule Auditor_C_TranscripAprobada{
+    description: "Se aprueba y actualiza el estado de la Transcripcion para incorporaicon a programa"
+    participant: "org.usb.library.programs.Auditor"
+    operation: CREATE
+    resource: "org.usb.library.programs.TranscripAprobada"
+    action: ALLOW 
+}
+/**
+ *Regas de acceso a Recursos.
+ */
+
+rule Proponente_RC_Transcripcion{
+    description: "Se aprueba y actualiza el estado de la Transcripcion para incorporaicon a programa"
+    participant: "org.usb.library.programs.Proponente"
+    operation: READ,CREATE
+    resource: "org.usb.library.programs.Transcripcion"
+    action: ALLOW 
+}
+
+rule Transcriptor_RU_Transcripcion{
+    description: "Se aprueba y actualiza el estado de la Transcripcion para incorporaicon a programa"
+    participant: "org.usb.library.programs.Transcriptor"
+    operation: READ,UPDATE
+    resource: "org.usb.library.programs.Transcripcion"
+    action: ALLOW 
+}
+rule Supervisor_RU_Transcripcion{
+    description: "Se aprueba y actualiza el estado de la Transcripcion para incorporaicon a programa"
+    participant: "org.usb.library.programs.Supervisor"
+    operation: READ,UPDATE
+    resource: "org.usb.library.programs.Transcripcion"
+    action: ALLOW 
+}
+rule Auditor_RU_Transcripcion{
+    description: "Se aprueba y actualiza el estado de la Transcripcion para incorporaicon a programa"
+    participant: "org.usb.library.programs.Auditor"
+    operation: READ,UPDATE
+    resource: "org.usb.library.programs.Transcripcion"
+    action: ALLOW 
+}
+rule ALL_R_Programa{
+    description: "Acceso de lectura de Programas a todos los participantes de la red"
+    participant: "org.usb.library.programs.*"
+    operation: READ
+    resource: "org.usb.library.programs.Transcripcion"
+    action: ALLOW 
+}
+/**
+ * Restriccion de acciones y recursos de no cumplirse ninguna regla anterior
+ */
+rule Default {
+    description: "Deny all participants access to all resources"
+    participant: "ANY"
+    operation: ALL
+    resource: "org.usb.library.programs.Transcripcion"
+    action: DENY
 }
