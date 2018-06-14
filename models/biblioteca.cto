@@ -1,0 +1,177 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Definicion de la Red de Biblioteca de la Universidad Simon Bolivar
+ */
+
+namespace org.usb.library.programs
+
+/***************
+ * TIPOS LOCALES*
+ ***************/
+
+enum EstadoP {
+}
+
+enum EstadoT {
+  o APROBADA
+  o ESPERA
+  o PENDIENTE
+}
+
+/***************
+ * RECURSOS_INI*
+ ***************/
+
+/**
+ * Recurso abstracto "Propuesta" utilizado en la red de biblioteca.
+ */
+abstract asset Propuesta identified by recursoId{
+    o String recursoId
+    o String denominacion
+    o String codigo
+    o String contenido
+    o DateTime  fechaElaboracion
+}
+
+/**
+ * Recurso "Programa" utilizado en la red de biblioteca. 
+ */
+
+
+asset Programa extends Propuesta {
+      o EstadoP estado
+}
+
+/**
+ * Recurso "Transcripcion" utilizado en la red de biblioteca. 
+ */
+
+asset Transcripcion extends Propuesta {
+      o EstadoT estado
+      o RevisionTranscrip[] revisionesTranscrip optional
+      o SupervisorAsignado supervisorAsignado optional
+      o TranscriptorAsignado transcriptorAsignado optional
+      o ObservacionTranscrip[] observaciones optional
+      --> Programa programa optional
+      
+
+}
+
+/***************
+ * RECURSOS_FIN*
+ ***************/
+
+/********************
+ * PARTICIPANTES_INI*
+ ********************/
+
+/** Participante A.ACTOR
+ * Participante abstracto "Actor" que representa a los actores involucrados
+ * dentro de la red de biblioteca. 
+ */
+abstract participant Actor identified by participantId{
+  o String participantId
+  o String rolAcademico
+}
+
+/** Participante TRANSCRIPTOR
+ * Participante encargado de ejecutar la transcripcion requerida
+ * una vez asignada y aceptada la solicitud. 
+ */
+participant Transcriptor extends Actor{
+  o String nombre
+  o String apellido
+  --> Transcripcion transcripcion optional
+}
+
+/** Participante SUPERVISOR
+ * Participante   encargado del seguimiento y revision
+ * de transcripciones existentes en la plataforma
+ */
+participant Supervisor extends Actor{
+  o String nombre
+  o String apellido
+}
+
+/** Participante AUDITOR
+ * Participante encargado de la auditoria de todas las operaciones
+ * realizadas dentro de la red de biblioteca.
+ */
+participant Auditor extends Actor{
+  o String denominacion optional
+}
+
+/** Participante PROPONENTE
+ * Participante encargado de iniciar y proponer una transcripcion.
+ */
+participant Proponente extends Actor{
+  o String nombre
+}
+/********************
+ * PARTICIPANTES_FIN*
+ ********************/
+  
+/********************
+ * TRANSACCIONES_INI*
+ ********************/
+  
+ 
+/** TRANSACCIONES DE TRANSCRIPCION
+ * Transacciones realizadas sobre el recurso de "Transcripcion".
+ */
+abstract transaction TranscripTransaccion{
+ --> Transcripcion transcripcion
+}
+
+transaction SupervisorAsignado extends TranscripTransaccion{
+ --> Supervisor supervisor
+}
+
+transaction TranscriptorAsignado extends TranscripTransaccion{
+ --> Transcriptor transcriptor
+}
+
+transaction RevisionTranscrip extends TranscripTransaccion{
+    o String revision
+}
+
+transaction ObservacionTranscrip extends TranscripTransaccion{
+    o String observacion
+    o Auditor autor
+}
+
+transaction TranscripPorValidar extends TranscripTransaccion{}
+
+transaction TranscripAprobada extends TranscripTransaccion{}
+
+/** TRANSACCIONES DE INSTANCIACION
+ * Transaccion para instanciacion de recursos para pruebas
+ */
+transaction InstanciarParticipantes {}
+
+
+/********************
+ * TRANSACCIONES_FIN*
+ ********************/
+
+/********************
+ * EVENTOS_INI*
+ ********************/
+
+
+/**************
+ * EVENTOS_FIN*
+ **************/
